@@ -24,11 +24,11 @@ This will start the following containers:
 
 ### Configure Your hosts File
 
-If you'd like to connect to the Kafka service from an application running on your local machine, you'll need to make a minor modification to your `hosts` file:
+If you'd like to connect to the Kafka and/or Zookeeper service from an application running on your local machine, you'll need to make a minor modification to your `hosts` file:
 
 ```
 ...
-127.0.0.1	localhost kafka
+127.0.0.1	localhost kafka zookeeper
 ...
 ```
 
@@ -59,3 +59,28 @@ http POST :80/topics/test \
 ```
 
 Refer to the [API documentation](https://docs.confluent.io/current/kafka-rest/docs/api.html) for a full list of API endpoints.
+
+### Via Docker Compose
+
+To allow your Dockerized application to connect to the Kafka services, you need to ensure that they're running on the same Docker network on your machine. Add the following to the `networks` configuration in your `docker-compose.yml` file:
+
+```
+networks:
+  kafka:
+    external:
+      name: confluent-docker_kafka
+```
+
+Then, in each of your application services, specify the `network` it should run in:
+
+```
+...
+services:
+...
+  myservice:
+    build: .
+    ...
+    networks:
+      - kafka
+...
+```
